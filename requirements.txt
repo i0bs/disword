@@ -1,0 +1,2 @@
+discord-py-interactions>=4.2.0
+interactions-enhanced
