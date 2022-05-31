@@ -22,20 +22,20 @@ class PrivacyPolicy(enhanced.EnhancedExtension):
         )
         embed.add_field(
             name="Logging data",
-            value="\n• ".join(
+            value="\n".join(
                 [
-                    "Messages are cached during `/translate automatic` interaction events while opt-in.",
-                    "The bot's overall guild count is tracked.",
-                    "A guild ID (and message ID if deemed necessary by internal workflow) are logged when an error is found.",
+                    "• Messages are cached during `/translate automatic` interaction events while opt-in.",
+                    "• The bot's overall guild count is tracked.",
+                    "• A guild ID (and message ID if deemed necessary by internal workflow) are logged when an error is found.",
                 ]
             ),
         )
         embed.add_field(
             name="Presence data",
-            value="\n• ".join(
+            value="\n".join(
                 [
-                    "A user's locale is checked to display commands in a localised convention.",
-                    "A guild member's bot status is used to determine translation interaction responses.",
+                    "• A user's locale is checked to display commands in a localised convention.",
+                    "• A guild member's bot status is used to determine translation interaction responses.",
                 ]
             ),
         )

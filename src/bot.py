@@ -15,9 +15,9 @@ logging.basicConfig(level=logging.WARNING)
 log = logging.getLogger()
 
 bot = interactions.Client(
-    const.TOKEN, intents=(interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGE_CONTENT)
+    const.TOKEN, intents=interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGE_CONTENT
 )
-bot.load("interactions.ext.enhanced")
+bot.load("interactions.ext.enhanced", debug_scope=False)
 [bot.load(f"exts.{ext}") for ext in const.EXTENSIONS]
 
 
