@@ -9,7 +9,7 @@ class PrivacyPolicy(enhanced.EnhancedExtension):
         self.bot = bot
 
     @enhanced.extension_command(name="privacy-policy")
-    async def command(self, ctx: interactions.CommandContext):
+    async def privacy_policy(self, ctx: interactions.CommandContext, *args, **kwargs):
         """Provides the privacy policy of Disword."""
         embed = interactions.Embed(
             title="Privacy policy",

@@ -1,2 +1,3 @@
-discord-py-interactions>=4.2.0
-enhanced
+deepl>=1.7
+discord-py-interactions>=4.2
+enhanced>=4.0

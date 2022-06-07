@@ -1,0 +1,33 @@
+help:
+  description: "Provides extensive information on how to use the bot."
+  explanation: >
+    Discord bots are hard to understand when you don't have the right help.
+    Disword simplifies a lot of its tools through the use of interactions and help.
+    Every command are provided a list of examples to familiarise the user with proper use.
+  examples:
+    - "`/help`: this presents the command with the base embed."
+    - "`/help [command]`: this presents information on a specific command.\n(example: `/help command: privacy_policy`)"
+privacy_policy:
+  description: "Provides the privacy policy of Disword."
+  explanation: |
+    Privacy is important on Discord. As a platform, its job is to ensure everyone's data and privacy is safe.
+    As a Discord bot, Disword's job is to comply with the standards provided by the platform.
+  examples:
+    - "`/privacy-policy`: this presents the user with our privacy policy statement."
+translate:
+  description: "A medium set of translaton tools."
+  explanation: >
+    Disword provides a set of translation tools as part of its main service.
+    As a medium, Disword has numerous examples provided for each command.
+    For more information regarding our variants, please see the select menu.
+  examples:
+    - "`/translate text`: this presents a translated result of text via. message ID or string."
+    - "`/translate automatic`: this presents a translated result during runtime of text sent by the user."
+usage:
+  description: "Provides statistics on the bot's usage."
+  explanation: >
+    Disword transparently provides statistics on how the bot is being used.
+    Currently, the only information that's provided is the character count.
+    Disword utilises the DeepL API under a **free** plan, which has a limit.
+  examples:
+    - "`/usage`: this presents the user with our statistics."

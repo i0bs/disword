@@ -1,0 +1,4 @@
+[flake8]
+extend-ignore =
+    F722, # forward annotations aren't needed to be checked for enhanced options.
+    F821, # undefined names come as a result of enhanced options being weirdly parsed.

@@ -11,13 +11,13 @@ sys.path.append("..")
 
 import const
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger()
 
 bot = interactions.Client(
     const.TOKEN, intents=interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGE_CONTENT
 )
-bot.load("interactions.ext.enhanced", debug_scope=False)
+bot.load("interactions.ext.enhanced")
 [bot.load(f"exts.{ext}") for ext in const.EXTENSIONS]
 
 
