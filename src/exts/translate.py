@@ -1,3 +1,4 @@
+import json
 import logging
 
 import deepl
@@ -5,6 +6,7 @@ import interactions
 from interactions.ext import enhanced
 
 import src.const
+import src.model
 
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger()
@@ -126,6 +128,42 @@ class Translate(enhanced.EnhancedExtension):
                 else:
                     await ctx.send(result.text)
 
+    @translate.subcommand(name="automatic")
+    async def translate_automatic(
+        self,
+        ctx: interactions.CommandContext,
+        base_res,
+        language: enhanced.EnhancedOption(
+            str, description="The language to translate to.", autocomplete=True
+        ),
+    ):
+        """Automatically translates messages sent to another language."""
+        db = json.loads(open("./db/translation.json", "r").read())
+        id: int = str(ctx.author.id)  # convert Snowflake to str
+
+        if db.get(id):
+            if db[id]["automatic"]:
+                db[id]["automatic"] = False
+                await ctx.send(
+                    ":heavy_check_mark: Automatic translation has been disabled.", ephemeral=True
+                )
+            else:
+                db[id]["automatic"] = True
+                await ctx.send(
+                    f":heavy_check_mark: Automatic translation for **{language.upper()}** has been enabled.",
+                    ephemeral=True,
+                )
+        else:
+            # FIXME: This is a poor implementation of easily accessing the language data.
+            # Yet again, DeepL cannot properly utilise a fucking enum.
+            db[id] = src.model.TranslationUser(language=deepl.Language.__dict__[language])
+            await ctx.send(
+                f":heavy_check_mark: Automatic translation for **{language.upper()}** has been enabled.",
+                ephemeral=True,
+            )
+
+        db = open("./db/translation.json", "w").write(json.dumps(db, indent=4, sort_keys=True))
+
     @interactions.extension_autocomplete(command="translate", name="language")
     async def _render_lang_translate(self, ctx: interactions.CommandContext, language: str = ""):
         """
@@ -137,12 +175,13 @@ class Translate(enhanced.EnhancedExtension):
         """
         letters: list = list(language) if language != "" else []
         languages: list[deepl.Language] = [
-            lang.capitalize() for lang in deepl.Language.__dict__ if lang.isupper()
+            lang.capitalize()
+            for lang in deepl.Language.__dict__
+            if lang.isupper()
+            or " ".join(spec.capitalize() for spec in lang.split("_") if "_" in lang)
+            for lang in deepl.Language.__dict__
+            if lang.isupper()
         ]
-
-        # This __dict__ approach is fucking stupid. It seems that the developers at DeepL
-        # don't know how the fuck to make their language class simply an enumerable
-        # and instead decided to throw them as constants to the object... yay.
 
         if not letters:
             await ctx.populate(
@@ -163,6 +202,29 @@ class Translate(enhanced.EnhancedExtension):
                     )
 
             await ctx.populate(choices)
+
+    @interactions.extension_listener(name="on_message_create")
+    async def _convert_auto_translate(self, message: interactions.Message):
+        """
+        Converts given messages from users to their desired language.
+        """
+        db = json.loads(open("./db/translation.json", "r").read())
+        id: str = str(message.author.id)  # convert Snowflake to str
+
+        if db.get("id") and db["id"] == id and db["id"]["automatic"]:
+            webhook = interactions.Webhook()
+            webhook = await webhook.create(
+                client=self.bot._http,
+                channel_id=int(message.channel_id),
+                name="Disword mimicked translation",
+            )
+            await webhook.execute(
+                message.content,
+                username=message.author.username,
+                avatar_url=message.author.avatar_url,
+            )
+            await message.delete()
+            await webhook.delete()
 
 
 def setup(bot: interactions.Client):
