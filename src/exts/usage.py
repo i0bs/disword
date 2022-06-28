@@ -1,5 +1,5 @@
 import deepl
-import interactions
+import interactions as i
 from interactions.ext import enhanced
 
 import src.const
@@ -8,13 +8,13 @@ import src.const
 class Usage(enhanced.EnhancedExtension):
     """An extension dedicated to /usage."""
 
-    def __init__(self, bot: interactions.Client):
+    def __init__(self, bot: i.Client):
         self.bot = bot
         self.translator = deepl.Translator(src.const.AUTH_KEY)
 
     @enhanced.extension_command()
     @enhanced.autodefer(delay=0)
-    async def usage(self, ctx: interactions.CommandContext):
+    async def usage(self, ctx: i.CommandContext):
         """Provides statistics on the bot's usage."""
         use: deepl.Usage = self.translator.get_usage()
 
@@ -31,17 +31,18 @@ class Usage(enhanced.EnhancedExtension):
             bar = bar + f" **{round(quota * 100)}%**"
             return bar
 
-        embed = interactions.Embed(
+        embed = i.Embed(
             title="Usage",
             fields=[
-                interactions.EmbedField(
+                i.EmbedField(
                     name="Character limit",
-                    value=create_bar(use.character.count, use.character.limit),
+                    value=create_bar(use.character.count, use.character.limit)
+                    + f"\n({use.character.count}/{use.character.limit})",
                 )
             ],
         )
         await ctx.send(embeds=embed)
 
 
-def setup(bot: interactions.Client):
+def setup(bot: i.Client):
     Usage(bot)

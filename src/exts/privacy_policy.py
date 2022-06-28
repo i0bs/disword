@@ -1,17 +1,17 @@
-import interactions
+import interactions as i
 from interactions.ext import enhanced
 
 
 class PrivacyPolicy(enhanced.EnhancedExtension):
     """An extension dedicated to /privacy-policy."""
 
-    def __init__(self, bot: interactions.Client):
+    def __init__(self, bot: i.Client):
         self.bot = bot
 
     @enhanced.extension_command(name="privacy-policy")
-    async def privacy_policy(self, ctx: interactions.CommandContext, *args, **kwargs):
+    async def privacy_policy(self, ctx: i.CommandContext, *args, **kwargs):
         """Provides the privacy policy of Disword."""
-        embed = interactions.Embed(
+        embed = i.Embed(
             title="Privacy policy",
             description=(
                 "Discord highly emphasises the safety and privacy of users on their platform. Disword "
@@ -42,5 +42,5 @@ class PrivacyPolicy(enhanced.EnhancedExtension):
         await ctx.send(embeds=embed, ephemeral=True)
 
 
-def setup(bot: interactions.Client):
+def setup(bot: i.Client):
     PrivacyPolicy(bot)

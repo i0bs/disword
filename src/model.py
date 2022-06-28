@@ -6,10 +6,12 @@ where we store how actions are ran.
 import attrs
 
 
-@attrs.define(kw_only=True)
+@attrs.define()
 class TranslationUser:
     """Represents a user's state when running translations."""
 
+    id: str = attrs.field()
+    """The ID of the user."""
     language: str = attrs.field()
     """The selected language for the user."""
     automatic: bool = attrs.field(default=True)
