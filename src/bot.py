@@ -17,6 +17,17 @@ log = logging.getLogger()
 bot = interactions.Client(
     const.TOKEN, intents=interactions.Intents.DEFAULT | interactions.Intents.GUILD_MESSAGE_CONTENT
 )
+bot.change_presence(
+    interactions.ClientPresence(
+        activities=[
+            interactions.PresenceActivity(
+                name="for /help.",
+                type=interactions.PresenceActivityType.WATCHING,
+            )
+        ],
+        status=interactions.StatusType.ONLINE,
+    )
+)
 bot.load("exts.help")
 bot.load("interactions.ext.enhanced")
 [bot.load(f"exts.{ext}") for ext in const.EXTENSIONS if ext != "help"]

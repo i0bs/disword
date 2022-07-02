@@ -170,6 +170,22 @@ class Translate(enhanced.EnhancedExtension):
 
         db = open("./db/translation.json", "w").write(json.dumps(db, indent=4, sort_keys=True))
 
+    # @translate.subcommand(name="document")
+    # async def translate_document(
+    #     self,
+    #     ctx: i.CommandContext,
+    #     base_res,
+    #     language: enhanced.EnhancedOption(
+    #         str, description="The language to translate to.", autocomplete=True
+    #     ),
+    #     file: enhanced.EnhancedOption(i.File, description="The document you wish to translate. Must be .pdf or .docx."),
+    # ):
+    #     """Translates a given document file with contents to another language."""
+    #     content = requests.get(file.url).text
+    #     id = uuid.uuid4()
+    #     name = f"./temp/{id}.{''.join(file.filename.split('.')[1:])}"
+    #     result = self.translator.translate_document(content, name, target_lang=language)
+
     @i.extension_autocomplete(command="translate", name="language")
     async def _render_lang_translate(self, ctx: i.CommandContext, language: str = ""):
         """
@@ -184,17 +200,19 @@ class Translate(enhanced.EnhancedExtension):
             lang.capitalize() for lang in deepl.Language.__dict__ if lang.isupper()
         ]
         languages.remove("English")
-
-        for lang in languages:
-            if "_" in lang:
-                languages.append(" ".join(part.capitalize() for part in lang.split("_")))
-                [languages.remove(lang) if "_" in lang else None]
-                continue
+        languages.remove("Portuguese")
 
         if not letters:
             await ctx.populate(
                 [
-                    i.Choice(name=lang, value=deepl.Language.__dict__[lang.upper()])
+                    i.Choice(
+                        name=(
+                            lang
+                            if not lang.startswith("English") and not lang.startswith("Portuguese")
+                            else f"{lang.split('_')[0]} {lang.split('_')[1][:1].upper()}{lang.split('_')[1][1:]}"
+                        ),
+                        value=deepl.Language.__dict__[lang.upper()],
+                    )
                     for lang in languages[0:24]
                 ]
             )
@@ -205,17 +223,15 @@ class Translate(enhanced.EnhancedExtension):
                 focus: str = "".join(letters)
 
                 if focus.lower() in lang.lower() and len(languages) > 26:
-                    if " " in lang:
-                        choices.append(
-                            i.Choice(
-                                name=lang,
-                                value=deepl.Language.__dict__[lang.replace(" ", "_").upper()],
-                            )
-                        )
-
                     choices.append(
                         i.Choice(
-                            name=lang, value=deepl.Language.__dict__[lang.replace(" ", "_").upper()]
+                            name=(
+                                lang
+                                if not lang.startswith("English")
+                                and not lang.startswith("Portuguese")
+                                else f"{lang.split('_')[0]} {lang.split('_')[1][:1].upper()}{lang.split('_')[1][1:]}"
+                            ),
+                            value=deepl.Language.__dict__[lang.upper()],
                         )
                     )
 
