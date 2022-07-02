@@ -1,3 +1,4 @@
 deepl>=1.7
 discord-py-interactions>=4.2
 enhanced>=4.0
+interactions-files>=1.0.3
