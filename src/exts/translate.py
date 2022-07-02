@@ -1,9 +1,12 @@
+import io
 import json
 import logging
+import uuid
 
 import attrs
 import deepl
 import interactions as i
+import requests
 from interactions.ext import enhanced
 
 import src.const
@@ -170,21 +173,33 @@ class Translate(enhanced.EnhancedExtension):
 
         db = open("./db/translation.json", "w").write(json.dumps(db, indent=4, sort_keys=True))
 
-    # @translate.subcommand(name="document")
-    # async def translate_document(
-    #     self,
-    #     ctx: i.CommandContext,
-    #     base_res,
-    #     language: enhanced.EnhancedOption(
-    #         str, description="The language to translate to.", autocomplete=True
-    #     ),
-    #     file: enhanced.EnhancedOption(i.File, description="The document you wish to translate. Must be .pdf or .docx."),
-    # ):
-    #     """Translates a given document file with contents to another language."""
-    #     content = requests.get(file.url).text
-    #     id = uuid.uuid4()
-    #     name = f"./temp/{id}.{''.join(file.filename.split('.')[1:])}"
-    #     result = self.translator.translate_document(content, name, target_lang=language)
+    @translate.subcommand(name="document")
+    async def translate_document(
+        self,
+        ctx: i.CommandContext,
+        base_res,
+        language: enhanced.EnhancedOption(
+            str, description="The language to translate to.", autocomplete=True
+        ),
+        file: enhanced.EnhancedOption(
+            i.File, description="The document you wish to translate. Must be .pdf or .docx."
+        ),
+    ):
+        """Translates a given document file with contents to another language."""
+        content = requests.get(file.url).text
+        id = uuid.uuid4()
+        name = f"{id}.{''.join(file.filename.split('.')[1:])}"
+        result = self.translator.translate_text(
+            content,
+            target_lang=language,
+            split_sentences=deepl.SplitSentences.OFF,
+            preserve_formatting=True,
+        )
+
+        file_to_send = io.StringIO(result.text)
+        with file_to_send as f:
+            _file = i.File(filename=name, fp=f)
+            await ctx.send(files=_file)
 
     @i.extension_autocomplete(command="translate", name="language")
     async def _render_lang_translate(self, ctx: i.CommandContext, language: str = ""):

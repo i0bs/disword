@@ -30,6 +30,7 @@ bot.change_presence(
 )
 bot.load("exts.help")
 bot.load("interactions.ext.enhanced")
+bot.load("interactions.ext.files")
 [bot.load(f"exts.{ext}") for ext in const.EXTENSIONS if ext != "help"]
 
 
