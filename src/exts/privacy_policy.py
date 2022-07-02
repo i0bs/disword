@@ -27,6 +27,7 @@ class PrivacyPolicy(enhanced.EnhancedExtension):
                     "• Messages are cached during `/translate automatic` interaction events while opt-in.",
                     "• The bot's overall guild count is tracked.",
                     "• A guild ID (and message ID if deemed necessary by internal workflow) are logged when an error is found.",
+                    "• A channel ID in your guild is saved to track a **webhook ID**, only used for automatic translation events. This is also opt-in.",
                 ]
             ),
         )

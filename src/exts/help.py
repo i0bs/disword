@@ -63,6 +63,7 @@ class Help(i.Extension):
         )
 
         if command is None:
+            embed.description = f"{table['help']['description']}\n\n{table['help']['explanation']}"
             [
                 [embed.add_field(name=cmd.name, value=cmd.description, inline=False)]
                 for cmd in commands
@@ -100,7 +101,11 @@ class Help(i.Extension):
                         "In order to use `message_id` specifically, you must have **Developer Mode** enabled in your settings. "
                         "This is accessible by going to User Settings > Advanced.\n",
                         '• `/translate text language: "de" string: "hello world"` will translate the contents into German.',
-                        '• `/translate text language: "de" message_id: "991384835790753843"` will translate the message of its ID given into German.',
+                        '• `/translate text language: "de" message_id: "991384835790753843"` will translate the message of its ID given into German.\n',
+                        "You can additionally pass another option, `formality` which controls how formal you want your response to sound. "
+                        "Some languages are not supported by the API for formality unfortunately, so you'll have to play around and see.\n",
+                        "`mimic` is another option provided in the command that allows your command response to appear as a **webhook** "
+                        "object. Please see `/translate automatic` for being able to control this automatically.",
                     ]
                 ),
             )

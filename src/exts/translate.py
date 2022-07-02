@@ -147,7 +147,7 @@ class Translate(enhanced.EnhancedExtension):
                     ":heavy_check_mark: Automatic translation has been disabled.", ephemeral=True
                 )
             else:
-                db[id].update({"automatic": True})
+                db[id].update({"automatic": True, "language": language})
                 await ctx.send(
                     f":heavy_check_mark: Automatic translation for **{language.upper()}** has been enabled.",
                     ephemeral=True,
@@ -161,7 +161,6 @@ class Translate(enhanced.EnhancedExtension):
                         int(ctx.author.id), deepl.Language.__dict__[key]
                     )
                     db.update({id: attrs.asdict(user)})
-                    print(db)
                     break
 
             await ctx.send(
@@ -181,9 +180,16 @@ class Translate(enhanced.EnhancedExtension):
         list of languages from the DeepL API.
         """
         letters: list = list(language) if language != "" else []
-        languages: list[deepl.Language] = [
+        languages: list[str] = [
             lang.capitalize() for lang in deepl.Language.__dict__ if lang.isupper()
         ]
+        languages.remove("English")
+
+        for lang in languages:
+            if "_" in lang:
+                languages.append(" ".join(part.capitalize() for part in lang.split("_")))
+                [languages.remove(lang) if "_" in lang else None]
+                continue
 
         if not letters:
             await ctx.populate(
@@ -199,7 +205,19 @@ class Translate(enhanced.EnhancedExtension):
                 focus: str = "".join(letters)
 
                 if focus.lower() in lang.lower() and len(languages) > 26:
-                    choices.append(i.Choice(name=lang, value=deepl.Language.__dict__[lang.upper()]))
+                    if " " in lang:
+                        choices.append(
+                            i.Choice(
+                                name=lang,
+                                value=deepl.Language.__dict__[lang.replace(" ", "_").upper()],
+                            )
+                        )
+
+                    choices.append(
+                        i.Choice(
+                            name=lang, value=deepl.Language.__dict__[lang.replace(" ", "_").upper()]
+                        )
+                    )
 
             await ctx.populate(choices)
 
@@ -209,23 +227,43 @@ class Translate(enhanced.EnhancedExtension):
         Converts given messages from users to their desired language.
         """
         db = json.loads(open("./db/translation.json", "r").read())
+        guilds = json.loads(open("./db/guilds.json", "r").read())
         id: str = str(message.author.id)  # convert Snowflake to str
 
         for user in db:
+            webhook = i.Webhook()
+
             if user == id and db[id]["automatic"]:
-                webhook = i.Webhook()
-                webhook = await webhook.create(
+                try:
+                    webhook = await webhook.create(
+                        client=self.bot._http,
+                        channel_id=int(message.channel_id),
+                        name="Disword mimicked translation",
+                    )
+                except TypeError:
+                    await self.bot._http.send_message(
+                        channel_id=message.channel_id,
+                        content="Disword is currently going through a webhook rate limit. Please try again later.",
+                    )
+
+                guilds.update({str(message.channel_id): str(webhook.id)})
+                guilds = open("./db/guilds.json", "w").write(
+                    json.dumps(guilds, indent=4, sort_keys=True)
+                )
+
+                result = self.translator.translate_text(
+                    message.content, target_lang=db[id]["language"].upper()
+                )
+                webhook = await webhook.get(
                     client=self.bot._http,
-                    channel_id=int(message.channel_id),
-                    name="Disword mimicked translation",
+                    webhook_id=guilds[message.channel_id],
                 )
                 await webhook.execute(
-                    message.content,
+                    result.text,
                     username=message.author.username,
                     avatar_url=message.author.avatar_url,
                 )
                 await message.delete()
-                await webhook.delete()
 
 
 def setup(bot: i.Client):
